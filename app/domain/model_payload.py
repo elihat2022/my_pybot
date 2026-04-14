@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import platform
-
+from typing import List, Dict, Any, Optional
 
 class AIModel(ABC):
     @abstractmethod
@@ -8,7 +8,8 @@ class AIModel(ABC):
         pass
 
 class BotAIModel(AIModel):
-    def __init__(self):
+    def __init__(self, tools_schema: Optional[List[Dict[str, Any]]] = None):
+        self.tools_schema = tools_schema or []
         self.os_name = platform.system()
         base_prompt = f"You are a helpful assistant. You have access to the user's terminal via the 'execute_terminal_command' tool. The user is currently running {self.os_name}."
 
@@ -29,8 +30,11 @@ class BotAIModel(AIModel):
             })
 
         payload = {
-            "model": "minimax/minimax-m2.7",
+            "model": "google/gemini-3.1-flash-lite-preview", 
             "temperature": 0.8,
             "messages": self.history
         }
+
+        if self.tools_schema:
+            payload["tools"] = self.tools_schema
         return payload

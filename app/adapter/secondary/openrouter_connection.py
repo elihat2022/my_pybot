@@ -1,6 +1,7 @@
 
 import os
 import httpx
+import json
 from app.ports.primary.ai_provider_port import AIProviderPort
 
 class OpenRouterConnection(AIProviderPort):
@@ -21,10 +22,9 @@ class OpenRouterConnection(AIProviderPort):
     async def generate_response(self, ai_model, message):
         payload = ai_model.set_payload(message)
         response = await self.http_client.post(f"{self.base_url}/chat/completions", json=payload, timeout=120)
-        
-        if response.status_code != 200:
-            raise Exception(f"Error from OpenRouter API: {response.status_code} - {response.text}")
-            
         data = response.json()
+        if "choices" not in data:
+            print(f"❌ OPENROUTER API ERROR: {json.dumps(data, indent=2)}")
+            return {"content": "Error: Could not retrieve response from provider."}
         return data["choices"][0]["message"]
         
