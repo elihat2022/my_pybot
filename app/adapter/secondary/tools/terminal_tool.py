@@ -1,4 +1,4 @@
-from app.ports.primary.tools_port import ToolsPort
+from app.ports.outbound.tools_port import ToolsPort
 import subprocess
 import platform
 from typing import List, Dict, Any
@@ -24,7 +24,14 @@ class SystemTerminalAdapter(ToolsPort):
             }
             }
         ]
-    def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> str:
+
+    def supports_tool(self, tool_name: str) -> bool:
+        return tool_name == "execute_terminal_command"
+
+    async def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> str:
+        if not self.supports_tool(tool_name):
+            return "Error: Tool not recognized by this adapter."
+
         command = arguments.get("command")
         if not command:
             return "Error: No command provided."

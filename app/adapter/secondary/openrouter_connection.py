@@ -2,7 +2,9 @@
 import os
 import httpx
 import json
-from app.ports.primary.ai_provider_port import AIProviderPort
+from typing import Any, Dict, List, Optional
+
+from app.ports.outbound.ai_provider_port import AIProviderPort
 
 class OpenRouterConnection(AIProviderPort):
     _instance = None
@@ -19,8 +21,22 @@ class OpenRouterConnection(AIProviderPort):
             self.http_client = httpx.AsyncClient(headers={"Authorization": f"Bearer {self.api_key}"})
             self.initialized = True
     
-    async def generate_response(self, ai_model, message):
-        payload = ai_model.set_payload(message)
+    async def generate_response(
+        self,
+        messages: List[Dict[str, Any]],
+        tools: Optional[List[Dict[str, Any]]] = None,
+        config: Optional[Dict[str, Any]] = None,
+    ):
+        payload: Dict[str, Any] = {
+            "model": "google/gemini-3.1-flash-lite-preview",
+            "temperature": 0.8,
+            "messages": messages,
+        }
+        if config:
+            payload.update(config)
+        if tools:
+            payload["tools"] = tools
+
         response = await self.http_client.post(f"{self.base_url}/chat/completions", json=payload, timeout=120)
         data = response.json()
         if "choices" not in data:

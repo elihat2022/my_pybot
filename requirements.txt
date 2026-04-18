@@ -1,0 +1,4 @@
+httpx
+python-dotenv
+tavily-python
+browser-use-sdk

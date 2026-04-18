@@ -2,7 +2,7 @@ import sqlite3
 import json
 
 from typing import List, Dict, Any
-from app.ports.primary.memory_port import MemoryPort
+from app.ports.outbound.memory_port import MemoryPort
 
 class SQLiteMemoryAdapter(MemoryPort):
     def __init__(self, db_path: str = "memory.db"):
