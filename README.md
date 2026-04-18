@@ -1,3 +1,5 @@
+![MY_PYBOT Cover](cover.jpeg)
+
 # My_PyBot
 
 An interactive CLI-based artificial intelligence agent.
